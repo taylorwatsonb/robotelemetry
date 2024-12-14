@@ -82,9 +82,15 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add performance stats
-        const stats = new Stats();
-        document.body.appendChild(stats.dom);
+        // Initialize stats if available
+        let stats;
+        try {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        } catch (e) {
+            console.warn('Stats.js not available');
+            stats = { begin: () => {}, end: () => {} };
+        }
 
         // Add orbit controls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);

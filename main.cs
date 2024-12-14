@@ -65,17 +65,18 @@ public class Program
             var random = new Random();
             while (true)
             {
+                var time = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond / 1000.0;
                 var state = new RobotState
                 {
-                    X = random.NextDouble() * 0.4 - 0.2,
-                    Y = random.NextDouble() * 0.4 - 0.2,
-                    Z = random.NextDouble() * 0.4 - 0.2,
-                    Roll = random.NextDouble() * Math.PI,
-                    Pitch = random.NextDouble() * Math.PI,
-                    Yaw = random.NextDouble() * Math.PI
+                    X = Math.Sin(time) * 0.5,
+                    Y = Math.Cos(time * 0.5) * 0.3,
+                    Z = Math.Sin(time * 0.7) * 0.4,
+                    Roll = Math.Sin(time * 0.3) * Math.PI * 0.25,
+                    Pitch = Math.Cos(time * 0.4) * Math.PI * 0.25,
+                    Yaw = time * 0.5
                 };
                 await hub.Clients.All.SendAsync("ReceiveState", state);
-                await Task.Delay(500);
+                await Task.Delay(50);
             }
         });
 
