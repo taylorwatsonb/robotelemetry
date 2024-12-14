@@ -55,15 +55,15 @@ public class Program
             {
                 var state = new RobotState
                 {
-                    X = random.NextDouble() * 2 - 1,
-                    Y = random.NextDouble() * 2 - 1,
-                    Z = random.NextDouble() * 2 - 1,
+                    X = random.NextDouble() * 0.4 - 0.2,
+                    Y = random.NextDouble() * 0.4 - 0.2,
+                    Z = random.NextDouble() * 0.4 - 0.2,
                     Roll = random.NextDouble() * Math.PI,
                     Pitch = random.NextDouble() * Math.PI,
                     Yaw = random.NextDouble() * Math.PI
                 };
                 await hub.Clients.All.SendAsync("ReceiveState", state);
-                await Task.Delay(100);
+                await Task.Delay(500);
             }
         });
 
