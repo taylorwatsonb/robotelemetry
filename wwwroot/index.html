@@ -5,6 +5,8 @@
     <title>Robot Telemetry Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         body { margin: 0; }
         canvas { display: block; }
@@ -31,17 +33,60 @@
     </div>
     <script>
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-        const robot = new THREE.Mesh(geometry, material);
+        // Add performance stats
+        const stats = new Stats();
+        document.body.appendChild(stats.dom);
+
+        // Add orbit controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // Add grid and axes
+        const gridHelper = new THREE.GridHelper(10, 10);
+        scene.add(gridHelper);
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
+
+        // Create detailed robot model
+        const robot = new THREE.Group();
+        
+        // Body
+        const bodyGeometry = new THREE.BoxGeometry(1, 0.5, 1.5);
+        const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x4444ff });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        robot.add(body);
+
+        // Head
+        const headGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+        const headMaterial = new THREE.MeshPhongMaterial({ color: 0x44ff44 });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 0.4;
+        robot.add(head);
+
         scene.add(robot);
 
-        camera.position.z = 5;
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Motion trail
+        const trail = [];
+        const maxTrailLength = 50;
+        const trailGeometry = new THREE.SphereGeometry(0.05);
+        const trailMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+        camera.position.set(5, 5, 5);
+        controls.update();
 
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/robotHub")
@@ -63,7 +108,21 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            controls.update();
+            stats.begin();
+
+            // Update trail
+            if (trail.length > maxTrailLength) {
+                scene.remove(trail[0]);
+                trail.shift();
+            }
+            const trailPoint = new THREE.Mesh(trailGeometry, trailMaterial);
+            trailPoint.position.copy(robot.position);
+            scene.add(trailPoint);
+            trail.push(trailPoint);
+
             renderer.render(scene, camera);
+            stats.end();
         }
         animate();
 
