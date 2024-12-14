@@ -69,7 +69,7 @@ public class Program
                 var state = new RobotState
                 {
                     X = Math.Sin(time) * 0.5,
-                    Y = Math.Cos(time * 0.5) * 0.3,
+                    Y = Math.Abs(Math.Cos(time * 0.5) * 0.3) + 0.5, // Keep Y positive and elevated
                     Z = Math.Sin(time * 0.7) * 0.4,
                     Roll = Math.Sin(time * 0.3) * Math.PI * 0.25,
                     Pitch = Math.Cos(time * 0.4) * Math.PI * 0.25,
