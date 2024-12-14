@@ -11,6 +11,7 @@ public class RobotState
     public double Pitch { get; set; }
     public double Yaw { get; set; }
     public static double SimulationSpeed { get; set; } = 1.0;
+    public static bool ManualControl { get; set; } = false;
 }
 
 public class SimulationControl
@@ -25,6 +26,7 @@ public class RobotHub : Hub
     public async Task UpdateState(RobotState state)
     {
         currentState = state;
+        RobotState.ManualControl = true;
         await Clients.All.SendAsync("ReceiveState", currentState);
     }
 
@@ -68,17 +70,20 @@ public class Program
             var random = new Random();
             while (true)
             {
-                var time = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond / 1000.0;
-                var state = new RobotState
+                if (!RobotState.ManualControl)
                 {
-                    X = Math.Sin(time) * 0.5,
-                    Y = Math.Abs(Math.Cos(time * 0.5) * 0.3) + 0.5, // Keep Y positive and elevated
-                    Z = Math.Sin(time * 0.7) * 0.4,
-                    Roll = 0,
-                    Pitch = 0,
-                    Yaw = 0
-                };
-                await hub.Clients.All.SendAsync("ReceiveState", state);
+                    var time = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond / 1000.0;
+                    var state = new RobotState
+                    {
+                        X = Math.Sin(time) * 0.5,
+                        Y = Math.Abs(Math.Cos(time * 0.5) * 0.3) + 0.5,
+                        Z = Math.Sin(time * 0.7) * 0.4,
+                        Roll = 0,
+                        Pitch = 0,
+                        Yaw = 0
+                    };
+                    await hub.Clients.All.SendAsync("ReceiveState", state);
+                }
                 await Task.Delay(50);
             }
         });
