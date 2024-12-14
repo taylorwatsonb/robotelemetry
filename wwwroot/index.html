@@ -2,35 +2,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Robot Telemetry Dashboard</title>
+    <title>3D Robot Telemetry Visualization</title>
+    <meta name="description" content="Real-time 3D robot telemetry visualization using Three.js and SignalR">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; }
+        body { 
+            margin: 0; 
+            font-family: 'Roboto', sans-serif;
+        }
         canvas { display: block; }
         #controls {
             position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
+            top: 20px;
+            left: 20px;
+            background: rgba(23, 32, 42, 0.95);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+        }
+        h3 {
+            margin: 0 0 15px 0;
+            color: #3498db;
+            font-weight: 500;
+        }
+        button {
+            background: #2980b9;
             color: white;
-            padding: 10px;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
             border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #3498db;
+        }
+        .state-value {
+            color: #2ecc71;
+            font-weight: 500;
+        }
+        .divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
     <div id="controls">
-        <h3>Robot State</h3>
-        <div>X: <span id="x">0</span></div>
-        <div>Y: <span id="y">0</span></div>
-        <div>Z: <span id="z">0</span></div>
-        <div>Roll: <span id="roll">0</span></div>
-        <div>Pitch: <span id="pitch">0</span></div>
-        <div>Yaw: <span id="yaw">0</span></div>
-        <hr>
+        <h3>🤖 Robot Telemetry</h3>
+        <div>Position</div>
+        <div>X: <span id="x" class="state-value">0</span></div>
+        <div>Y: <span id="y" class="state-value">0</span></div>
+        <div>Z: <span id="z" class="state-value">0</span></div>
+        <div class="divider"></div>
+        <div>Rotation</div>
+        <div>Roll: <span id="roll" class="state-value">0</span></div>
+        <div>Pitch: <span id="pitch" class="state-value">0</span></div>
+        <div>Yaw: <span id="yaw" class="state-value">0</span></div>
+        <div class="divider">
         <h3>Manual Controls</h3>
         <button onclick="sendManualState(0.1, 0, 0)">Forward</button>
         <button onclick="sendManualState(-0.1, 0, 0)">Backward</button>
