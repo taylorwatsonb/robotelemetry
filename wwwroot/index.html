@@ -66,13 +66,48 @@
         <div>Roll: <span id="roll" class="state-value">0</span></div>
         <div>Pitch: <span id="pitch" class="state-value">0</span></div>
         <div>Yaw: <span id="yaw" class="state-value">0</span></div>
-        <div class="divider">
+        <div class="divider"></div>
         <h3>Manual Controls</h3>
-        <button onclick="sendManualState(0.1, 0, 0)">Forward</button>
-        <button onclick="sendManualState(-0.1, 0, 0)">Backward</button>
-        <button onclick="sendManualState(0, 0.1, 0)">Up</button>
-        <button onclick="sendManualState(0, -0.1, 0)">Down</button>
+        <div class="control-grid">
+            <button onclick="sendManualState(0.1, 0, 0)">Forward ↑</button>
+            <button onclick="sendManualState(-0.1, 0, 0)">Backward ↓</button>
+            <button onclick="sendManualState(0, 0, -0.1)">Left ←</button>
+            <button onclick="sendManualState(0, 0, 0.1)">Right →</button>
+            <button onclick="sendManualState(0, 0.1, 0)">Up ⇧</button>
+            <button onclick="sendManualState(0, -0.1, 0)">Down ⇩</button>
+        </div>
+        <div class="control-info">Step Size: 0.1 units</div>
     </div>
+    <style>
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .control-info {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: #3498db;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
     <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a1a);
