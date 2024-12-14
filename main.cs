@@ -10,6 +10,12 @@ public class RobotState
     public double Roll { get; set; }
     public double Pitch { get; set; }
     public double Yaw { get; set; }
+    public static double SimulationSpeed { get; set; } = 1.0;
+}
+
+public class SimulationControl
+{
+    public double Speed { get; set; }
 }
 
 public class RobotHub : Hub
@@ -17,6 +23,12 @@ public class RobotHub : Hub
     public async Task UpdateState(RobotState state)
     {
         await Clients.All.SendAsync("ReceiveState", state);
+    }
+
+    public async Task UpdateSimulationSpeed(SimulationControl control)
+    {
+        RobotState.SimulationSpeed = control.Speed;
+        await Clients.All.SendAsync("SimulationSpeedUpdated", control.Speed);
     }
 }
 

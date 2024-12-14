@@ -30,6 +30,12 @@
         <div>Roll: <span id="roll">0</span></div>
         <div>Pitch: <span id="pitch">0</span></div>
         <div>Yaw: <span id="yaw">0</span></div>
+        <hr>
+        <h3>Manual Controls</h3>
+        <button onclick="sendManualState(0.1, 0, 0)">Forward</button>
+        <button onclick="sendManualState(-0.1, 0, 0)">Backward</button>
+        <button onclick="sendManualState(0, 0.1, 0)">Up</button>
+        <button onclick="sendManualState(0, -0.1, 0)">Down</button>
     </div>
     <script>
         const scene = new THREE.Scene();
@@ -105,6 +111,18 @@
         });
 
         connection.start();
+
+        async function sendManualState(x, y, z) {
+            const state = {
+                x: x,
+                y: y,
+                z: z,
+                roll: 0,
+                pitch: 0,
+                yaw: 0
+            };
+            await connection.invoke("UpdateState", state);
+        }
 
         function animate() {
             requestAnimationFrame(animate);
