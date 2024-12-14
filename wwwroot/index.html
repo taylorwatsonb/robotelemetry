@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Telemetry Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h3>Robot State</h3>
+        <div>X: <span id="x">0</span></div>
+        <div>Y: <span id="y">0</span></div>
+        <div>Z: <span id="z">0</span></div>
+        <div>Roll: <span id="roll">0</span></div>
+        <div>Pitch: <span id="pitch">0</span></div>
+        <div>Yaw: <span id="yaw">0</span></div>
+    </div>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        const robot = new THREE.Mesh(geometry, material);
+        scene.add(robot);
+
+        camera.position.z = 5;
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/robotHub")
+            .build();
+
+        connection.on("ReceiveState", (state) => {
+            robot.position.set(state.x, state.y, state.z);
+            robot.rotation.set(state.roll, state.pitch, state.yaw);
+            
+            document.getElementById("x").textContent = state.x.toFixed(2);
+            document.getElementById("y").textContent = state.y.toFixed(2);
+            document.getElementById("z").textContent = state.z.toFixed(2);
+            document.getElementById("roll").textContent = state.roll.toFixed(2);
+            document.getElementById("pitch").textContent = state.pitch.toFixed(2);
+            document.getElementById("yaw").textContent = state.yaw.toFixed(2);
+        });
+
+        connection.start();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
