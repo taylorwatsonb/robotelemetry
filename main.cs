@@ -20,9 +20,12 @@ public class SimulationControl
 
 public class RobotHub : Hub
 {
+    private static RobotState currentState = new RobotState();
+    
     public async Task UpdateState(RobotState state)
     {
-        await Clients.All.SendAsync("ReceiveState", state);
+        currentState = state;
+        await Clients.All.SendAsync("ReceiveState", currentState);
     }
 
     public async Task UpdateSimulationSpeed(SimulationControl control)

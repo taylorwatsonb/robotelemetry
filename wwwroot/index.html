@@ -207,11 +207,11 @@
 
         connection.start();
 
-        async function sendManualState(x, y, z) {
+        async function sendManualState(dx, dy, dz) {
             const state = {
-                x: x,
-                y: y,
-                z: z,
+                x: robot.position.x + dx,
+                y: Math.max(0.5, robot.position.y + dy), // Keep above grid
+                z: robot.position.z + dz,
                 roll: 0,
                 pitch: 0,
                 yaw: 0
